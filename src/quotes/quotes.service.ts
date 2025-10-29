@@ -1,42 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
-import { Quote } from './entity/quotes.entity';
 import { Repository } from 'typeorm';
-import type {
-  Quote as QuoteType,
-  QuoteData,
-  quoteId,
-} from './types/quotes.model';
+import { Quote } from './entities/quotes.entity';
+import { UpdateQuoteDto } from './dto/update-quote.dto';
+import { CreateQuoteDto } from './dto/create-quote.dto';
 
 @Injectable()
 export class QuotesService {
   constructor(
-    // Inject TypeORM's Repository for the User entity
     @InjectRepository(Quote)
-    private quoteRepository: Repository<Quote>,
+    private readonly quoteRepository: Repository<Quote>,
   ) {}
 
+  async createQuote(CreateQuoteDto: CreateQuoteDto): Promise<Quote> {
+    const newQuote = this.quoteRepository.create(CreateQuoteDto);
+    return await this.quoteRepository.save(newQuote);
+  }
+
   async findAll(): Promise<Quote[]> {
-    return this.quoteRepository.find();
+    return await this.quoteRepository.find();
   }
 
-  async findOne(id: quoteId): Promise<Quote | null> {
-    return this.quoteRepository.findOne({ where: { id } });
+  async findOne(id: number): Promise<Quote> {
+    const quote = await this.quoteRepository.findOneBy({ id });
+    if (!quote) {
+      throw new NotFoundException(`Quote with id ${id} not found`);
+    }
+    return quote;
   }
 
-  async createQuote(quote: QuoteType): Promise<QuoteData> {
-    const newQuote = this.quoteRepository.create(quote);
-    return this.quoteRepository.save(newQuote);
+  async update(id: number, updateQuoteDto: UpdateQuoteDto): Promise<Quote> {
+    const quote = await this.findOne(id);
+    const updatedQuote = Object.assign(quote, updateQuoteDto);
+    return await this.quoteRepository.save(updatedQuote);
   }
 
-  async update(id: quoteId, quoteData: QuoteType): Promise<QuoteData | null> {
-    console.log(id, quoteData);
-    await this.quoteRepository.update(id, quoteData);
-
-    return this.quoteRepository.findOne({ where: { id } });
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.quoteRepository.delete(id);
+  async remove(id: number): Promise<Quote> {
+    const quote = await this.findOne(id);
+    await this.quoteRepository.remove(quote);
+    return quote;
   }
 }

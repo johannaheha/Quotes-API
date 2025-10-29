@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { QuotesModule } from './quotes/quotes.module';
 
-import { Quote } from './quotes/entity/quotes.entity';
+import { Quote } from './quotes/entities/quotes.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
