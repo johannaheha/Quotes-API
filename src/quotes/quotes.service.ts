@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Quote } from './entities/quotes.entity';
@@ -13,13 +12,23 @@ export class QuotesService {
     private readonly quoteRepository: Repository<Quote>,
   ) {}
 
-  async createQuote(CreateQuoteDto: CreateQuoteDto): Promise<Quote> {
+  async create(CreateQuoteDto: CreateQuoteDto): Promise<Quote> {
     const newQuote = this.quoteRepository.create(CreateQuoteDto);
     return await this.quoteRepository.save(newQuote);
   }
 
   async findAll(): Promise<Quote[]> {
     return await this.quoteRepository.find();
+  }
+
+  async findRandom(): Promise<Quote> {
+    const quote = await this.quoteRepository
+      .createQueryBuilder('q')
+      .orderBy('RANDOM()')
+      .getOne();
+
+    if (!quote) throw new NotFoundException('No quotes available');
+    return quote;
   }
 
   async findOne(id: number): Promise<Quote> {

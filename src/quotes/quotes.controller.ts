@@ -4,39 +4,49 @@ import {
   Post,
   Body,
   Param,
-  Delete,
   Put,
+  Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
-
-import type { Quote as QuoteType, quoteId } from './types/quotes.model';
+import { CreateQuoteDto } from './dto/create-quote.dto';
+import { UpdateQuoteDto } from './dto/update-quote.dto';
+import { Quote } from './entities/quotes.entity';
 
 @Controller('quotes')
 export class QuotesController {
   constructor(private readonly quotesService: QuotesService) {}
 
+  @Post()
+  create(@Body() dto: CreateQuoteDto): Promise<Quote> {
+    return this.quotesService.create(dto);
+  }
+
   @Get()
-  getAll() {
+  findAll(): Promise<Quote[]> {
     return this.quotesService.findAll();
   }
 
+  @Get('random')
+  getRandom(): Promise<Quote> {
+    return this.quotesService.findRandom();
+  }
+
   @Get(':id')
-  getOne(@Param('id') id: quoteId) {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Quote> {
     return this.quotesService.findOne(id);
   }
 
-  @Post()
-  addQuote(@Body() quoteData: QuoteType) {
-    return this.quotesService.createQuote(quoteData);
-  }
-
   @Put(':id')
-  update(@Param('id') id: quoteId, @Body() quoteData: QuoteType) {
-    return this.quotesService.update(id, quoteData);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateQuoteDto,
+  ): Promise<Quote> {
+    return this.quotesService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.quotesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number): Promise<Quote> {
+    return this.quotesService.remove(id);
   }
 }
