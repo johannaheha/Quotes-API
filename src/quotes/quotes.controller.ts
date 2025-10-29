@@ -12,6 +12,7 @@ import { QuotesService } from './quotes.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
 import { Quote } from './entities/quotes.entity';
+import { Public } from '../auth/public.decorator';
 
 @Controller('quotes')
 export class QuotesController {
@@ -22,6 +23,7 @@ export class QuotesController {
     return this.quotesService.create(dto);
   }
 
+  @Public()
   @Get()
   findAll(): Promise<Quote[]> {
     return this.quotesService.findAll();
@@ -32,6 +34,7 @@ export class QuotesController {
     return this.quotesService.findRandom();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Quote> {
     return this.quotesService.findOne(id);

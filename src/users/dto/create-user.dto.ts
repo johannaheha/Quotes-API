@@ -1,10 +1,32 @@
-import { MinLength, IsString, IsEmail } from 'class-validator';
+// src/users/dto/create-user.dto.ts
+import {
+  IsAlphanumeric,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
+  @IsAlphanumeric()
+  @MinLength(3)
+  @MaxLength(50)
+  @Transform(({ value }) => value?.trim())
+  username!: string;
+
+  @IsOptional()
   @IsEmail()
-  email: string;
+  @Transform(({ value }) => value?.trim())
+  email?: string;
 
   @IsString()
   @MinLength(8)
-  password: string;
+  @MaxLength(255)
+  password!: string;
+
+  @IsOptional()
+  roles?: string[]; // optional; default im Service: ['user']
 }
