@@ -14,14 +14,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // This 'payload' is the decoded JWT payload
-    // You can fetch the user from your database here using payload.sub (user ID)
-    // or return the payload directly if all necessary user info is in the token.
     const user = await this.usersService.findById(payload.sub); // Assuming findById exists and fetches the user
     if (!user) {
-      // This should ideally not happen if the token is valid and signed by you
-      // and the user still exists in the DB.
-      // You might throw an UnauthorizedException here if the user doesn't exist.
     }
     return {
       userId: payload.sub,
