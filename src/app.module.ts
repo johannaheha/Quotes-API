@@ -17,7 +17,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
       type: 'sqlite',
       database: 'dev.sqlite',
       entities: [Quote, User],
-      synchronize: false,
+      synchronize: true,
       logging: false,
     }),
     UsersModule,
