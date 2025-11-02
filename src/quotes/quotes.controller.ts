@@ -23,7 +23,6 @@ export class QuotesController {
     return this.quotesService.create(dto);
   }
 
-  @Public()
   @Get()
   findAll(): Promise<Quote[]> {
     return this.quotesService.findAll();

@@ -9,15 +9,15 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    UsersModule, // Make sure your UsersModule is imported to use UserService
+    UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your_secret_key', // USE A STRONG, ENVIRONMENTAL VARIABLE!
-      signOptions: { expiresIn: '60s' }, // Token expiration (e.g., 60 seconds)
+      secret: process.env.JWT_SECRET || 'your_secret_key',
+      signOptions: { expiresIn: '15m' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy], // Add your strategies
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule], // Export AuthService and JwtModule if needed elsewhere
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

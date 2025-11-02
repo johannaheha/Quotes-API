@@ -1,11 +1,13 @@
-import { Controller, Post, UseGuards, Req, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Req, Body, Get } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { Public } from './public.decorator';
+import { AuthUser, SafeUser } from './types/auth.user';
 
-type AuthenticatedRequest = Request & { user: any };
+type AuthenticatedRequestLocal = Request & { user: SafeUser | null };
+type AuthenticatedRequestJwt = Request & { user: AuthUser | null };
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +16,11 @@ export class AuthController {
   @Public()
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  login(@Req() req: AuthenticatedRequest, @Body() _loginDto: LoginDto) {
+  login(@Req() req: AuthenticatedRequestLocal, @Body() _loginDto: LoginDto) {
     return this.authService.login(req.user);
+  }
+  @Get('me')
+  herzeil(@Req() req: AuthenticatedRequestJwt) {
+    return req.user;
   }
 }
