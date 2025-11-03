@@ -20,7 +20,7 @@ export class AuthController {
     return this.authService.login(req.user);
   }
   @Get('me')
-  herzeil(@Req() req: AuthenticatedRequestJwt) {
+  getMe(@Req() req: AuthenticatedRequestJwt) {
     return req.user;
   }
 }
