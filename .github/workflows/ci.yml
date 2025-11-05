@@ -20,95 +20,35 @@ jobs:
       CI: true
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-
-      - name: Enable Corepack (yarn/pnpm support)
-        run: corepack enable
-
-      - name: Detect package manager
-        id: pm
-        shell: bash
-        run: |
-          if [ -f pnpm-lock.yaml ]; then
-            echo "name=pnpm" >> $GITHUB_OUTPUT
-          elif [ -f yarn.lock ]; then
-            echo "name=yarn" >> $GITHUB_OUTPUT
-          else
-            echo "name=npm" >> $GITHUB_OUTPUT
-          fi
+          cache: 'npm'
 
       - name: Install dependencies
-        shell: bash
-        run: |
-          case "${{ steps.pm.outputs.name }}" in
-            pnpm) pnpm install --frozen-lockfile ;;
-            yarn) yarn install --frozen-lockfile ;;
-            npm)  npm ci ;;
-          esac
+        run: npm ci
 
       - name: Lint
-        shell: bash
-        run: |
-          has_script() { node -e "const s=require('./package.json').scripts||{}; process.exit(s['$1']?0:1)" ; }
-          PM="${{ steps.pm.outputs.name }}"
-          if has_script lint; then
-            case "$PM" in
-              pnpm) pnpm run lint ;;
-              yarn) yarn lint ;;
-              npm)  npm run lint ;;
-            esac
-          else
-            echo "No 'lint' script in package.json — skipping."
-          fi
+        run: npm run lint
+        
 
-      - name: Build (compile NestJS)
-        shell: bash
-        run: |
-          has_script() { node -e "const s=require('./package.json').scripts||{}; process.exit(s['$1']?0:1)" ; }
-          PM="${{ steps.pm.outputs.name }}"
-          if has_script build; then
-            case "$PM" in
-              pnpm) pnpm run build ;;
-              yarn) yarn build ;;
-              npm)  npm run build ;;
-            esac
-          else
-            echo "No 'build' script in package.json — skipping."
-          fi
+      - name: Build (NestJS compile)
+        run: npm run build
+        
 
       - name: Run unit tests
-        shell: bash
-        run: |
-          has_script() { node -e "const s=require('./package.json').scripts||{}; process.exit(s['$1']?0:1)" ; }
-          PM="${{ steps.pm.outputs.name }}"
-          if has_script test; then
-            case "$PM" in
-              pnpm) pnpm test -- --ci ;;
-              yarn) yarn test --ci ;;
-              npm)  npm test -- --ci ;;
-            esac
-          else
-            echo "No 'test' script in package.json — skipping."
-          fi
+        run: npm test -- --ci --runInBand
+    
 
-      - name: Run e2e tests (if present)
-        shell: bash
-        continue-on-error: false
+      - name: Run e2e tests (falls vorhanden)
+        if: ${{ contains(join(fromJSON('[""]'), ''), '') }} # no-op; step läuft nur, wenn Script existiert
         run: |
-          has_script() { node -e "const s=require('./package.json').scripts||{}; process.exit(s['$1']?0:1)" ; }
-          PM="${{ steps.pm.outputs.name }}"
-          if has_script "test:e2e"; then
-            case "$PM" in
-              pnpm) pnpm run test:e2e -- --ci ;;
-              yarn) yarn test:e2e --ci ;;
-              npm)  npm run test:e2e -- --ci ;;
-            esac
+          if npm run | grep -q "test:e2e"; then
+            npm run test:e2e -- --ci --runInBand
           else
-            echo "No 'test:e2e' script in package.json — skipping."
+            echo "No test:e2e script — skipping."
           fi
