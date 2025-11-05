@@ -1,63 +1,72 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
-  Put,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  Logger,
+  Param,
   ParseIntPipe,
-  Request,
+  Post,
+  Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+interface AuthUser {
+  userId: number;
+  roles?: string[];
+}
+type AuthenticatedRequest = Request & { user?: AuthUser };
+
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
+
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard) // Protect this endpoint--> user routes in general need authentication
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard) // Protect this endpoint
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Request() req: any) {
-    // You can access the authenticated user via req.user
-    console.log('Authenticated user:', req.user);
+  findAll(@Req() req: AuthenticatedRequest) {
+    this.logger.debug(`Authenticated userId=${req.user?.userId ?? 'n/a'}`);
     return this.usersService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard) // Protect this endpoint
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    // You might want to add authorization logic here (e.g., only owner or admin can see)
-    // if (req.user.userId !== id && !req.user.roles?.includes('admin')) {
-    //   throw new ForbiddenException();
-    // }
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() _req: AuthenticatedRequest,
+  ) {
     return this.usersService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard) // Protect this endpoint
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-    @Request() req: any,
+    @Req() _req: AuthenticatedRequest,
   ) {
-    // Add authorization logic here (owner/admin)
     return this.usersService.update(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard) // Protect this endpoint
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    // Add authorization logic here (owner/admin)
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() _req: AuthenticatedRequest,
+  ) {
     return this.usersService.remove(id);
   }
 }
