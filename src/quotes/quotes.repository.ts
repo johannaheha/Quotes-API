@@ -5,16 +5,16 @@ export interface Quote {
 }
 
 export class QuotesRepository {
-  async findAll(): Promise<Quote[]> {
+  findAll(): Promise<Quote[]> {
     return [];
   }
-  async findOne(id: number): Promise<Quote | null> {
+  findOne(id: number): Promise<Quote | null> {
     return null;
   }
-  async create(data: Omit<Quote, 'id'>): Promise<Quote> {
+  create(data: Omit<Quote, 'id'>): Promise<Quote> {
     return { id: 1, ...data };
   }
-  async remove(_id: number): Promise<void> {
+  remove(_id: number): Promise<void> {
     return;
   }
 }
