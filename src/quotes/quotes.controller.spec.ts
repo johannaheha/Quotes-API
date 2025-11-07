@@ -35,7 +35,7 @@ describe('QuotesController', () => {
   });
 
   it('create should delegate to service with typed DTO', async () => {
-    const dto: CreateQuoteDto = { text: 'hi', author: 'you' };
+    const dto: CreateQuoteDto = { quote: 'hi', author: 'you' };
     await controller.create(dto);
     expect(serviceMock.create).toHaveBeenCalledWith(dto);
   });
