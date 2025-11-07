@@ -6,15 +6,18 @@ export interface Quote {
 
 export class QuotesRepository {
   findAll(): Promise<Quote[]> {
-    return [];
+    return Promise.resolve([]);
   }
-  findOne(id: number): Promise<Quote | null> {
-    return null;
+
+  findOne(_id: number): Promise<Quote | null> {
+    return Promise.resolve(null);
   }
+
   create(data: Omit<Quote, 'id'>): Promise<Quote> {
-    return { id: 1, ...data };
+    return Promise.resolve({ id: 1, ...data });
   }
+
   remove(_id: number): Promise<void> {
-    return;
+    return Promise.resolve();
   }
 }
