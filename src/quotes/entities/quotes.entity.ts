@@ -6,12 +6,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('quote') // exakt die existierende Tabelle
+@Entity('quote')
 export class Quote {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // DB-Spalte heißt 'text' -> mappe sie auf die Property 'quote'
   @Column({ name: 'quote', length: 500, nullable: false })
   quote: string;
 
