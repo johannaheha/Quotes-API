@@ -12,7 +12,7 @@ export class Quote {
   id: number;
 
   // DB-Spalte heißt 'text' -> mappe sie auf die Property 'quote'
-  @Column({ name: 'text', length: 500, nullable: false })
+  @Column({ name: 'quote', length: 500, nullable: false })
   quote: string;
 
   @Column({ name: 'author', nullable: true })
