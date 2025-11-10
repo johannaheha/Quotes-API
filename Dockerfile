@@ -12,7 +12,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 # nur prod deps installieren
 COPY --from=builder /app/package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev  
 # Build-Artefakte
 COPY --from=builder /app/dist ./dist
 

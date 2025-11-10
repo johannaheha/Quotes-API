@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { QuotesModule } from './quotes/quotes.module';
@@ -12,14 +13,20 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
+    // lädt .env (lokal) und ENV Variablen (Render)
+    ConfigModule.forRoot({ isGlobal: true }),
+
     QuotesModule,
+
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'dev.sqlite',
+      type: 'postgres',
+      url: process.env.DATABASE_URL, // z.B. ...?sslmode=require
+      ssl: { rejectUnauthorized: false }, // nötig für Render-Postgres (TLS)
       entities: [Quote, User],
-      synchronize: true,
-      logging: false,
+      synchronize: true, // für ersten Deploy ok; später auf false + Migrations umstellen
+      logging: ['query', 'error'],
     }),
+
     UsersModule,
     AuthModule,
   ],
