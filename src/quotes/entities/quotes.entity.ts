@@ -1,13 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity() // This decorator tells TypeORM that this class is a database entity (table)
+@Entity('quote') // exakt die existierende Tabelle
 export class Quote {
-  @PrimaryGeneratedColumn() // Marks 'id' as the primary key, and it auto-increments
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 500, nullable: false }) // 'firstName' column, string, max 100 chars, not null
+  // DB-Spalte heißt 'text' -> mappe sie auf die Property 'quote'
+  @Column({ name: 'text', length: 500, nullable: false })
   quote: string;
 
-  @Column({ nullable: true }) // 'lastName' column, can be null
-  author: string; // `?` in TypeScript means the property is optional
+  @Column({ name: 'author', nullable: true })
+  author?: string;
+
+  @CreateDateColumn({ name: 'createdAt' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updatedAt' })
+  updatedAt: Date;
 }

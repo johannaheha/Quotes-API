@@ -1,4 +1,3 @@
-// scripts/seed.cjs
 require('dotenv/config');
 const { DataSource } = require('typeorm');
 const { readFileSync } = require('fs');
